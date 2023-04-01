@@ -291,9 +291,7 @@ BEST_LTC = {
 
 def score(config, n=5):
 
-    means = []
-    for i in range(n):
-        means.append(eval(config, speed=True))
+    means = [eval(config, speed=True) for _ in range(n)]
     print(f"Test AUC: {np.mean(means):0.4f} $\\pm$ {np.std(means):0.4f} ")
 
 

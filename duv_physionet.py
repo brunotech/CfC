@@ -35,7 +35,7 @@ def get_physio(args, device):
     )
 
     # Combine and shuffle samples from physionet Train and physionet Test
-    total_dataset = train_dataset_obj[: len(train_dataset_obj)]
+    total_dataset = train_dataset_obj[:]
     # print("total_dataset len: ", len(total_dataset))
     # Shuffle and split
     train_data, test_data = train_test_split(
@@ -73,7 +73,7 @@ def get_physio(args, device):
     )
 
     attr_names = train_dataset_obj.params
-    data_objects = {
+    return {
         "dataset_obj": train_dataset_obj,
         "train_dataloader": train_dataloader,
         "test_dataloader": test_dataloader,
@@ -85,8 +85,7 @@ def get_physio(args, device):
         "attr": attr_names,  # optional
         "classif_per_tp": False,  # optional
         "n_labels": 1,
-    }  # optional
-    return data_objects
+    }
 
 
 # get minimum and maximum for each feature across the whole dataset
@@ -204,11 +203,7 @@ class PhysioNet(object):
                 "Dataset not found. You can use download=True to download it"
             )
 
-        if self.train:
-            data_file = self.training_file
-        else:
-            data_file = self.test_file
-
+        data_file = self.training_file if self.train else self.test_file
         if device == torch.device("cpu"):
             self.data = torch.load(
                 os.path.join(self.processed_folder, data_file), map_location="cpu"
@@ -261,7 +256,7 @@ class PhysioNet(object):
             tar.extractall(self.raw_folder)
             tar.close()
 
-            print("Processing {}...".format(filename))
+            print(f"Processing {filename}...")
 
             dirname = os.path.join(self.raw_folder, filename.split(".")[0])
             patients = []
@@ -309,7 +304,7 @@ class PhysioNet(object):
                         else:
                             assert (
                                 param == "RecordID"
-                            ), "Read unexpected param {}".format(param)
+                            ), f"Read unexpected param {param}"
                 tt = torch.tensor(tt).to(device)
                 vals = torch.stack(vals)
                 mask = torch.stack(mask)
@@ -356,11 +351,11 @@ class PhysioNet(object):
 
     @property
     def training_file(self):
-        return "set-a_{}.pt".format(self.quantization)
+        return f"set-a_{self.quantization}.pt"
 
     @property
     def test_file(self):
-        return "set-b_{}.pt".format(self.quantization)
+        return f"set-b_{self.quantization}.pt"
 
     @property
     def label_file(self):
@@ -376,12 +371,12 @@ class PhysioNet(object):
         return self.labels[record_id]
 
     def __repr__(self):
-        fmt_str = "Dataset " + self.__class__.__name__ + "\n"
-        fmt_str += "    Number of datapoints: {}\n".format(self.__len__())
-        fmt_str += "    Split: {}\n".format("train" if self.train is True else "test")
-        fmt_str += "    Root Location: {}\n".format(self.root)
-        fmt_str += "    Quantization: {}\n".format(self.quantization)
-        fmt_str += "    Reduce: {}\n".format(self.reduce)
+        fmt_str = f"Dataset {self.__class__.__name__}" + "\n"
+        fmt_str += f"    Number of datapoints: {self.__len__()}\n"
+        fmt_str += f'    Split: {"train" if self.train is True else "test"}\n'
+        fmt_str += f"    Root Location: {self.root}\n"
+        fmt_str += f"    Quantization: {self.quantization}\n"
+        fmt_str += f"    Reduce: {self.reduce}\n"
         return fmt_str
 
     def visualize(self, timesteps, data, mask, plot_name):
