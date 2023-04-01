@@ -217,9 +217,12 @@ class PersonActivity(object):
                             mask[-1][self.tag_dict[tag_id]] = 1
                             nobs[-1][self.tag_dict[tag_id]] += 1
 
-                            if label in self.label_names:
-                                if torch.sum(labels[-1][self.label_dict[label]]) == 0:
-                                    labels[-1][self.label_dict[label]] = 1
+                            if (
+                                label in self.label_names
+                                and torch.sum(labels[-1][self.label_dict[label]])
+                                == 0
+                            ):
+                                labels[-1][self.label_dict[label]] = 1
                         else:
                             assert (
                                 tag_id == "RecordID"
@@ -256,19 +259,18 @@ class PersonActivity(object):
         return len(self.data)
 
     def __repr__(self):
-        fmt_str = "Dataset " + self.__class__.__name__ + "\n"
-        fmt_str += "    Number of datapoints: {}\n".format(self.__len__())
-        fmt_str += "    Root Location: {}\n".format(self.root)
-        fmt_str += "    Max length: {}\n".format(self.max_seq_length)
-        fmt_str += "    Reduce: {}\n".format(self.reduce)
+        fmt_str = f"Dataset {self.__class__.__name__}" + "\n"
+        fmt_str += f"    Number of datapoints: {self.__len__()}\n"
+        fmt_str += f"    Root Location: {self.root}\n"
+        fmt_str += f"    Max length: {self.max_seq_length}\n"
+        fmt_str += f"    Reduce: {self.reduce}\n"
         return fmt_str
 
 
 def get_person_id(record_id):
     # The first letter is the person id
     person_id = record_id[0]
-    person_id = ord(person_id) - ord("A")
-    return person_id
+    return ord(person_id) - ord("A")
 
 
 def variable_time_collate_fn_activity(
@@ -373,7 +375,7 @@ def get_person_dataset(args):
         # ),
     )
 
-    data_objects = {
+    return {
         "dataset_obj": dataset_obj,
         "train_dataloader": train_dataloader,
         "test_dataloader": test_dataloader,
@@ -383,8 +385,6 @@ def get_person_dataset(args):
         "classif_per_tp": True,  # optional
         "n_labels": labels.size(-1),
     }
-
-    return data_objects
 
 
 if __name__ == "__main__":
@@ -399,7 +399,7 @@ if __name__ == "__main__":
         n = 10000
 
     ds = get_person_dataset(FakeArg())
-    for batch in ds["train_dataloader"]:
+    for _ in ds["train_dataloader"]:
         breakpoint()
     # dataset = PersonActivity("data/PersonActivity", download=True)
     # dataloader = DataLoader(

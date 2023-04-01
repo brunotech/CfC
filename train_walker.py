@@ -78,11 +78,9 @@ def eval(config, index_arg, verbose=0):
         callbacks=[BackupCallback(model)],
         verbose=0,
     )
-    # Evaluate model after training
-    test_loss = model.evaluate(
+    return model.evaluate(
         x=(data.test_x, data.test_times), y=data.test_y, verbose=2
     )
-    return test_loss
 
 
 

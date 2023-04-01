@@ -82,7 +82,7 @@ class CfcCell(nn.Module):
             nn.Linear(input_size + hidden_size, self.hparams["backbone_units"]),
             backbone_activation(),
         ]
-        for i in range(1, self.hparams["backbone_layers"]):
+        for _ in range(1, self.hparams["backbone_layers"]):
             layer_list.append(
                 nn.Linear(
                     self.hparams["backbone_units"], self.hparams["backbone_units"]
@@ -125,7 +125,7 @@ class CfcCell(nn.Module):
         if self._minimal:
             # Solution
             ff1 = self.ff1(x)
-            new_hidden = (
+            return (
                 -self.A
                 * torch.exp(-ts * (torch.abs(self.w_tau) + torch.abs(ff1)))
                 * ff1
@@ -138,11 +138,11 @@ class CfcCell(nn.Module):
             t_a = self.time_a(x)
             t_b = self.time_b(x)
             t_interp = self.sigmoid(t_a * ts + t_b)
-            if self._no_gate:
-                new_hidden = ff1 + t_interp * ff2
-            else:
-                new_hidden = ff1 * (1.0 - t_interp) + t_interp * ff2
-        return new_hidden
+            return (
+                ff1 + t_interp * ff2
+                if self._no_gate
+                else ff1 * (1.0 - t_interp) + t_interp * ff2
+            )
 
 
 
@@ -227,12 +227,11 @@ class Cfc(nn.Module):
                 output_sequence.append(self.fc(h_state))
 
         if self.return_sequences:
-            readout = torch.stack(output_sequence, dim=1)
+            return torch.stack(output_sequence, dim=1)
         elif mask is not None:
-            readout = forwarded_output
+            return forwarded_output
         else:
-            readout = self.fc(h_state)
-        return readout
+            return self.fc(h_state)
 
 
 class LTCCell(nn.Module):
@@ -378,7 +377,7 @@ class LTCCell(nn.Module):
         )
 
         # Unfold the multiply ODE multiple times into one RNN step
-        for t in range(self._ode_unfolds):
+        for _ in range(self._ode_unfolds):
             w_activation = self.softplus(self._params["w"]) * self._sigmoid(
                 v_pre, self._params["mu"], self._params["sigma"]
             )
@@ -404,14 +403,12 @@ class LTCCell(nn.Module):
 
     def _map_inputs(self, inputs):
         inputs = inputs * self._params["input_w"]
-        inputs = inputs + self._params["input_b"]
-        return inputs
+        return inputs + self._params["input_b"]
 
     def _map_outputs(self, state):
         output = state
         output = output * self._params["output_w"]
-        output = output + self._params["output_b"]
-        return output
+        return output + self._params["output_b"]
 
     def _clip(self, w):
         return torch.nn.ReLU()(w)
@@ -427,8 +424,4 @@ class LTCCell(nn.Module):
         ts = ts.view((-1, 1))
         inputs = self._map_inputs(input)
 
-        next_state = self._ode_solver(inputs, hx, ts)
-
-        # outputs = self._map_outputs(next_state)
-
-        return next_state
+        return self._ode_solver(inputs, hx, ts)

@@ -39,16 +39,10 @@ class CfcCell(tf.keras.layers.Layer):
         else:
             raise ValueError("Unknown backbone activation")
 
-        self._no_gate = False
-        if "no_gate" in self.hparams:
-            self._no_gate = self.hparams["no_gate"]
-        self._minimal = False
-        if "minimal" in self.hparams:
-            self._minimal = self.hparams["minimal"]
-
+        self._no_gate = self.hparams["no_gate"] if "no_gate" in self.hparams else False
+        self._minimal = self.hparams["minimal"] if "minimal" in self.hparams else False
         self.backbone = []
-        for i in range(self.hparams["backbone_layers"]):
-
+        for _ in range(self.hparams["backbone_layers"]):
             self.backbone.append(
                 tf.keras.layers.Dense(
                     self.hparams["backbone_units"],
@@ -107,7 +101,7 @@ class CfcCell(tf.keras.layers.Layer):
     def call(self, inputs, states, **kwargs):
         hidden_state = states[0]
         t = 1.0
-        if (isinstance(inputs, tuple) or isinstance(inputs, list)) and len(inputs) > 1:
+        if (isinstance(inputs, (tuple, list))) and len(inputs) > 1:
             elapsed = inputs[1]
             t = tf.reshape(elapsed, [-1, 1])
             inputs = inputs[0]
@@ -183,7 +177,7 @@ class MixedCfcCell(tf.keras.layers.Layer):
     def call(self, inputs, states, **kwargs):
         cell_state, ode_state = states
         elapsed = tf.zeros((1,), dtype=tf.float32)
-        if (isinstance(inputs, tuple) or isinstance(inputs, list)) and len(inputs) > 1:
+        if (isinstance(inputs, (tuple, list))) and len(inputs) > 1:
             elapsed = inputs[1]
             inputs = inputs[0]
 
@@ -381,7 +375,7 @@ class LTCCell(tf.keras.layers.AbstractRNNCell):
         )
 
         # Unfold the multiply ODE multiple times into one RNN step
-        for t in range(self._ode_unfolds):
+        for _ in range(self._ode_unfolds):
             w_activation = self._params["w"] * self._sigmoid(
                 v_pre, self._params["mu"], self._params["sigma"]
             )
@@ -406,14 +400,12 @@ class LTCCell(tf.keras.layers.AbstractRNNCell):
 
     def _map_inputs(self, inputs):
         inputs = inputs * self._params["input_w"]
-        inputs = inputs + self._params["input_b"]
-        return inputs
+        return inputs + self._params["input_b"]
 
     def _map_outputs(self, state):
         output = state
         output = output * self._params["output_w"]
-        output = output + self._params["output_b"]
-        return output
+        return output + self._params["output_b"]
 
     def call(self, inputs, states):
         if isinstance(inputs, (tuple, list)):

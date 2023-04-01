@@ -40,7 +40,7 @@ elif args.model == "minimal":
 elif args.model == "mixed":
     cell = MixedCfcCell(units=args.size, hparams=CFC_CONFIG)
 else:
-    raise ValueError("Unknown model type '{}'".format(args.model))
+    raise ValueError(f"Unknown model type '{args.model}'")
 
 pixel_input = tf.keras.Input(shape=(data.pad_size, 1), name="pixel")
 time_input = tf.keras.Input(shape=(data.pad_size, 1), name="time")

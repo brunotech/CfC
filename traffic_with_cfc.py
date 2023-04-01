@@ -15,7 +15,7 @@ import datetime as dt
 
 def load_trace():
     df = pd.read_csv("data/traffic/Metro_Interstate_Traffic_Volume.csv")
-    holiday = (df["holiday"].values == None).astype(np.float32)
+    holiday = (df["holiday"].values is None).astype(np.float32)
     temp = df["temp"].values.astype(np.float32)
     temp -= np.mean(temp)  # normalize temp by annual mean
     rain = df["rain_1h"].values.astype(np.float32)
@@ -62,7 +62,7 @@ class TrafficData:
         self.train_x = np.stack(train_x, axis=0)
         self.train_y = np.stack(train_y, axis=0)
         total_seqs = self.train_x.shape[1]
-        print("Total number of training sequences: {}".format(total_seqs))
+        print(f"Total number of training sequences: {total_seqs}")
         permutation = np.random.RandomState(23489).permutation(total_seqs)
         valid_size = int(0.1 * total_seqs)
         test_size = int(0.15 * total_seqs)
@@ -127,7 +127,7 @@ def eval(config, index_arg, verbose=0):
         cell = MixedCfcCell(units=config["size"], hparams=config)
     else:
         cell = CfcCell(units=config["size"], hparams=config)
-    
+
     data = TrafficData(seq_len=32, batch_size=config["batch_size"])
 
     signal_input = tf.keras.Input(shape=(data.seq_len, data.input_size), name="robot")
@@ -169,11 +169,7 @@ def eval(config, index_arg, verbose=0):
         callbacks=[BackupCallback(model)],
         verbose=1,
     )
-    # Evaluate model after training
-    test_loss = model.evaluate(
-        x=data.test, verbose=2
-    )
-    return test_loss
+    return model.evaluate(x=data.test, verbose=2)
 
 
 BEST_DEFAULT = {

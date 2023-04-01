@@ -134,28 +134,28 @@ class ETSMnistData:
         self.test_elapsed /= self.pad_size
 
     def load_from_cache(self):
-        if os.path.isfile("dataset/test_mask.npy"):
-            self.train_events = np.load("dataset/train_events.npy")
-            self.train_elapsed = np.load("dataset/train_elapsed.npy")
-            self.train_mask = np.load("dataset/train_mask.npy")
-            self.train_y = np.load("dataset/train_y.npy")
+        if not os.path.isfile("dataset/test_mask.npy"):
+            return False
+        self.train_events = np.load("dataset/train_events.npy")
+        self.train_elapsed = np.load("dataset/train_elapsed.npy")
+        self.train_mask = np.load("dataset/train_mask.npy")
+        self.train_y = np.load("dataset/train_y.npy")
 
-            self.test_events = np.load("dataset/test_events.npy")
-            self.test_elapsed = np.load("dataset/test_elapsed.npy")
-            self.test_mask = np.load("dataset/test_mask.npy")
-            self.test_y = np.load("dataset/test_y.npy")
+        self.test_events = np.load("dataset/test_events.npy")
+        self.test_elapsed = np.load("dataset/test_elapsed.npy")
+        self.test_mask = np.load("dataset/test_mask.npy")
+        self.test_y = np.load("dataset/test_y.npy")
 
-            print("train_events.shape: ", str(self.train_events.shape))
-            print("train_elapsed.shape: ", str(self.train_elapsed.shape))
-            print("train_mask.shape: ", str(self.train_mask.shape))
-            print("train_y.shape: ", str(self.train_y.shape))
+        print("train_events.shape: ", self.train_events.shape)
+        print("train_elapsed.shape: ", self.train_elapsed.shape)
+        print("train_mask.shape: ", self.train_mask.shape)
+        print("train_y.shape: ", self.train_y.shape)
 
-            print("test_events.shape: ", str(self.test_events.shape))
-            print("test_elapsed.shape: ", str(self.test_elapsed.shape))
-            print("test_mask.shape: ", str(self.test_mask.shape))
-            print("test_y.shape: ", str(self.test_y.shape))
-            return True
-        return False
+        print("test_events.shape: ", self.test_events.shape)
+        print("test_elapsed.shape: ", self.test_elapsed.shape)
+        print("test_mask.shape: ", self.test_mask.shape)
+        print("test_y.shape: ", self.test_y.shape)
+        return True
 
     def transform_sample(self, x):
         x = x.flatten()
@@ -223,7 +223,7 @@ class ETSMnistData:
         )
 
         print("Average time-series length: {:0.2f}".format(np.mean(self._all_lenghts)))
-        print("Abort counter: ", str(self._abort_counter))
+        print("Abort counter: ", self._abort_counter)
         os.makedirs("dataset", exist_ok=True)
         np.save("dataset/train_events.npy", self.train_events)
         np.save("dataset/train_elapsed.npy", self.train_elapsed)
@@ -267,11 +267,11 @@ class PersonData:
             all_x, all_t, all_y, seq_len=seq_len, inc=seq_len // 2
         )
 
-        print("all_x.shape: ", str(all_x.shape))
-        print("all_t.shape: ", str(all_t.shape))
-        print("all_y.shape: ", str(all_y.shape))
+        print("all_x.shape: ", all_x.shape)
+        print("all_t.shape: ", all_t.shape)
+        print("all_y.shape: ", all_y.shape)
         total_seqs = all_x.shape[0]
-        print("Total number of sequences: {}".format(total_seqs))
+        print(f"Total number of sequences: {total_seqs}")
         permutation = np.random.RandomState(98841).permutation(total_seqs)
         test_size = int(0.2 * total_seqs)
 
@@ -284,11 +284,11 @@ class PersonData:
 
         self.feature_size = int(self.train_x.shape[-1])
 
-        print("train_x.shape: ", str(self.train_x.shape))
-        print("train_t.shape: ", str(self.train_t.shape))
-        print("train_y.shape: ", str(self.train_y.shape))
-        print("Total number of train sequences: {}".format(self.train_x.shape[0]))
-        print("Total number of test  sequences: {}".format(self.test_x.shape[0]))
+        print("train_x.shape: ", self.train_x.shape)
+        print("train_t.shape: ", self.train_t.shape)
+        print("train_y.shape: ", self.train_y.shape)
+        print(f"Total number of train sequences: {self.train_x.shape[0]}")
+        print(f"Total number of test  sequences: {self.test_x.shape[0]}")
 
     def load_crappy_formated_csv(self):
 
@@ -390,28 +390,28 @@ class XORData:
         self.test_elapsed /= self.pad_size
 
     def load_from_cache(self):
-        if os.path.isfile("dataset/xor_test_y.npy"):
-            self.train_events = np.load("dataset/xor_train_events.npy")
-            self.train_elapsed = np.load("dataset/xor_train_elapsed.npy")
-            self.train_mask = np.load("dataset/xor_train_mask.npy")
-            self.train_y = np.load("dataset/xor_train_y.npy")
+        if not os.path.isfile("dataset/xor_test_y.npy"):
+            return False
+        self.train_events = np.load("dataset/xor_train_events.npy")
+        self.train_elapsed = np.load("dataset/xor_train_elapsed.npy")
+        self.train_mask = np.load("dataset/xor_train_mask.npy")
+        self.train_y = np.load("dataset/xor_train_y.npy")
 
-            self.test_events = np.load("dataset/xor_test_events.npy")
-            self.test_elapsed = np.load("dataset/xor_test_elapsed.npy")
-            self.test_mask = np.load("dataset/xor_test_mask.npy")
-            self.test_y = np.load("dataset/xor_test_y.npy")
+        self.test_events = np.load("dataset/xor_test_events.npy")
+        self.test_elapsed = np.load("dataset/xor_test_elapsed.npy")
+        self.test_mask = np.load("dataset/xor_test_mask.npy")
+        self.test_y = np.load("dataset/xor_test_y.npy")
 
-            print("train_events.shape: ", str(self.train_events.shape))
-            print("train_elapsed.shape: ", str(self.train_elapsed.shape))
-            print("train_mask.shape: ", str(self.train_mask.shape))
-            print("train_y.shape: ", str(self.train_y.shape))
+        print("train_events.shape: ", self.train_events.shape)
+        print("train_elapsed.shape: ", self.train_elapsed.shape)
+        print("train_mask.shape: ", self.train_mask.shape)
+        print("train_y.shape: ", self.train_y.shape)
 
-            print("test_events.shape: ", str(self.test_events.shape))
-            print("test_elapsed.shape: ", str(self.test_elapsed.shape))
-            print("test_mask.shape: ", str(self.test_mask.shape))
-            print("test_y.shape: ", str(self.test_y.shape))
-            return True
-        return False
+        print("test_events.shape: ", self.test_events.shape)
+        print("test_elapsed.shape: ", self.test_elapsed.shape)
+        print("test_mask.shape: ", self.test_mask.shape)
+        print("test_y.shape: ", self.test_y.shape)
+        return True
 
     def create_event_based_sample(self, rng):
 
@@ -425,7 +425,7 @@ class XORData:
         elapsed_counter = 0
         length = rng.randint(low=2, high=self.pad_size)
 
-        for i in range(length):
+        for _ in range(length):
             elapsed_counter += 1
 
             char = int(rng.randint(low=0, high=2))
@@ -460,7 +460,7 @@ class XORData:
         elapsed_counter = 0
 
         length = rng.randint(low=2, high=self.pad_size)
-        for i in range(length):
+        for _ in range(length):
             elapsed_counter += 1
 
             char = int(rng.randint(low=0, high=2))
@@ -482,11 +482,12 @@ class XORData:
         mask_list = []
         label_list = []
 
-        for i in tqdm(range(size)):
-            if self.event_based:
-                events, elapsed, mask, label = self.create_event_based_sample(rng)
-            else:
-                events, elapsed, mask, label = self.create_dense_sample(rng)
+        for _ in tqdm(range(size)):
+            events, elapsed, mask, label = (
+                self.create_event_based_sample(rng)
+                if self.event_based
+                else self.create_dense_sample(rng)
+            )
             events_list.append(events)
             elapsed_list.append(elapsed)
             mask_list.append(mask)
@@ -516,17 +517,17 @@ class XORData:
             self.test_y,
         ) = self.create_set(10000, 48736)
 
-        print("train_events.shape: ", str(self.train_events.shape))
-        print("train_elapsed.shape: ", str(self.train_elapsed.shape))
-        print("train_mask.shape: ", str(self.train_mask.shape))
-        print("train_y.shape: ", str(self.train_y.shape))
+        print("train_events.shape: ", self.train_events.shape)
+        print("train_elapsed.shape: ", self.train_elapsed.shape)
+        print("train_mask.shape: ", self.train_mask.shape)
+        print("train_y.shape: ", self.train_y.shape)
 
-        print("test_events.shape: ", str(self.test_events.shape))
-        print("test_elapsed.shape: ", str(self.test_elapsed.shape))
-        print("test_mask.shape: ", str(self.test_mask.shape))
-        print("test_y.shape: ", str(self.test_y.shape))
+        print("test_events.shape: ", self.test_events.shape)
+        print("test_elapsed.shape: ", self.test_elapsed.shape)
+        print("test_mask.shape: ", self.test_mask.shape)
+        print("test_y.shape: ", self.test_y.shape)
 
-        print("Abort counter: ", str(self._abort_counter))
+        print("Abort counter: ", self._abort_counter)
         os.makedirs("dataset", exist_ok=True)
         np.save("dataset/xor_train_events.npy", self.train_events)
         np.save("dataset/xor_train_elapsed.npy", self.train_elapsed)
@@ -561,10 +562,10 @@ class NBodyData:
         )
         self.input_size = self.train_x.shape[-1]
 
-        print("train_elapsed ", str(self.train_elapsed.shape))
-        print("train_x: ", str(self.train_x.shape))
-        print("train_y: ", str(self.train_y.shape))
-        print("train_mask: ", str(self.train_mask.shape))
+        print("train_elapsed ", self.train_elapsed.shape)
+        print("train_x: ", self.train_x.shape)
+        print("train_y: ", self.train_y.shape)
+        print("train_mask: ", self.train_mask.shape)
 
     def load_file(self, filename):
         arr = np.load(filename)

@@ -221,7 +221,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="cfc")
     args = parser.parse_args()
 
-    if args.model not in model_zoo.keys():
+    if args.model in model_zoo:
+        eval(model_zoo[args.model])
+    else:
         raise ValueError(f"Unknown model '{args.model}', avilable: {list(model_zoo.keys())}")
-
-    eval(model_zoo[args.model])
